@@ -47,7 +47,7 @@ export default function ClothesDetail() {
         return (
             <div className="flex flex-wrap gap-2">
                 {values.map(value => (
-                    <span key={value} className="px-2 py-1 text-xs rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
+                    <span key={value} className="liquid-chip !py-1 text-xs">
                         {value}
                     </span>
                 ))}
@@ -103,7 +103,7 @@ export default function ClothesDetail() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center">
+            <div className="min-h-screen flex flex-col items-center justify-center">
                 <div className="w-10 h-10 border-4 border-zinc-200 dark:border-zinc-700 border-t-accent rounded-full animate-spin"></div>
                 <p className="mt-4 text-sm text-zinc-500">{t('clothesDetail.loading')}</p>
             </div>
@@ -112,7 +112,7 @@ export default function ClothesDetail() {
 
     if (!item || error) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] p-4">
+            <div className="min-h-screen p-4">
                 <header className="glass-header px-4 py-4 -mx-4">
                     <button className="btn-icon" onClick={() => navigate('/wardrobe')}>
                         <ArrowLeft size={22} />
@@ -132,7 +132,7 @@ export default function ClothesDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] pb-8 animate-fade-in">
+        <div className="min-h-screen pb-8 animate-fade-in">
             <header className="glass-header px-4 py-4 sticky top-0">
                 <div className="flex items-center gap-2">
                     <button className="btn-icon" onClick={() => navigate('/wardrobe')}>
@@ -144,15 +144,15 @@ export default function ClothesDetail() {
 
             <div className="p-4 sm:px-6 lg:px-8 space-y-4 max-w-6xl mx-auto w-full lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0">
                 <article className="card overflow-hidden lg:col-span-5">
-                    <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 p-6 flex items-center justify-center">
+                    <div className="media-tile aspect-square p-6 flex items-center justify-center">
                         <img
                             src={toImageUrl(item.image_url)}
                             alt={item.item}
                             className="w-full h-full object-contain drop-shadow-md"
                         />
                     </div>
-                    <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
-                        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{item.item}</h2>
+                    <div className="p-4 border-t border-[var(--line)]">
+                        <h2 className="text-lg font-semibold text-[var(--text-primary)]">{item.item}</h2>
                         <p className="text-sm text-zinc-500 mt-1">{item.category}</p>
                     </div>
                 </article>
@@ -196,7 +196,7 @@ export default function ClothesDetail() {
                             {t('clothesDetail.tryOnUpload')}
                         </label>
                         {personImagePreview && (
-                            <img src={personImagePreview} alt="person preview" className="w-full max-h-80 object-contain rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800" />
+                            <img src={personImagePreview} alt="person preview" className="media-tile w-full max-h-80 object-contain p-2" />
                         )}
                     </div>
 
@@ -213,7 +213,7 @@ export default function ClothesDetail() {
                     {tryOnResultUrl && (
                         <div className="space-y-2">
                             <h4 className="text-sm font-medium text-zinc-500">{t('clothesDetail.tryOnResult')}</h4>
-                            <img src={tryOnResultUrl} alt="try on result" className="w-full max-h-[28rem] object-contain rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800" />
+                            <img src={tryOnResultUrl} alt="try on result" className="media-tile w-full max-h-[28rem] object-contain p-2" />
                         </div>
                     )}
                 </section>

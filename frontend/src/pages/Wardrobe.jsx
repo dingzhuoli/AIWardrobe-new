@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import FilterBar from '../components/FilterBar'
-import { Trash2 } from 'lucide-react'
+import { PackageOpen, Trash2 } from 'lucide-react'
 
 import { API_BASE, toImageUrl } from '../utils/api'
 
@@ -116,8 +116,8 @@ export default function Wardrobe() {
     )
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] animate-fade-in pb-8">
-            <header className="glass-header px-4 py-4 sticky top-0">
+        <div className="min-h-screen animate-fade-in pb-8">
+            <header className="glass-header px-4 py-4">
                 <FilterBar onSearch={handleSearch} onFilterChange={handleFilterChange} />
             </header>
 
@@ -132,8 +132,8 @@ export default function Wardrobe() {
                         </div>
 
                         {section.items.length === 0 ? (
-                            <div className="card p-8 flex flex-col items-center justify-center text-zinc-400 border-dashed bg-zinc-50/50 dark:bg-zinc-800/50">
-                                <span className="text-3xl mb-2 opacity-50">📦</span>
+                            <div className="empty-state p-8">
+                                <PackageOpen size={30} className="mb-2 opacity-70" />
                                 <p className="text-sm">{t('wardrobe.noMatch')}</p>
                             </div>
                         ) : (
@@ -152,7 +152,7 @@ export default function Wardrobe() {
                                         role="button"
                                         tabIndex={0}
                                     >
-                                        <div className="relative aspect-square bg-zinc-100 dark:bg-zinc-800 p-4 flex items-center justify-center overflow-hidden">
+                                        <div className="media-tile relative aspect-square p-4 flex items-center justify-center overflow-hidden">
                                             <img
                                                 src={toImageUrl(item.image_url)}
                                                 alt={item.item}
@@ -160,8 +160,8 @@ export default function Wardrobe() {
                                                 className="w-full h-full object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-500"
                                             />
                                         </div>
-                                        <div className="p-3 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
-                                            <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate pr-2">{item.item}</span>
+                                        <div className="p-3 flex items-center justify-between border-t border-[var(--line)]">
+                                            <span className="text-sm font-medium text-[var(--text-primary)] truncate pr-2">{item.item}</span>
                                             <button
                                                 className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 p-1.5 rounded-md transition-colors"
                                                 onClick={(event) => {

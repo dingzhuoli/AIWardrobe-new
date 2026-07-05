@@ -157,27 +157,27 @@ export default function Upload({ onUploadSuccess }) {
     return (
         <div className="w-full">
             <div
-                className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center p-8 bg-white dark:bg-zinc-900 ${
-                    isDragging ? 'border-accent bg-blue-50/50 dark:bg-blue-950/30 scale-[1.02]' : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/50'
+                className={`liquid-upload relative overflow-hidden transition-all duration-300 flex flex-col items-center justify-center p-8 ${
+                    isDragging ? 'scale-[1.01] border-[var(--accent)]' : 'hover:border-[var(--accent)]'
                 }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 style={{ minHeight: '300px' }}
             >
-                <div className="w-16 h-16 mb-4 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
+                <div className="liquid-glass w-16 h-16 mb-4 rounded-full flex items-center justify-center text-[var(--accent)]">
                     <UploadIcon size={28} />
                 </div>
 
-                <h3 className="text-lg font-serif font-semibold text-zinc-800 dark:text-zinc-200 mb-1">{t('upload.title')}</h3>
-                <p className="text-sm text-zinc-500 mb-8 text-center">{t('upload.subtitle')}<br/>{t('upload.subtitleAI')}</p>
+                <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">{t('upload.title')}</h3>
+                <p className="text-sm text-[var(--text-secondary)] mb-8 text-center leading-relaxed">{t('upload.subtitle')}<br />{t('upload.subtitleAI')}</p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs">
                     <button className="flex-1 btn-primary" onClick={handleCameraClick}>
                         <Camera size={18} />
                         {t('upload.camera')}
                     </button>
-                    <button className="flex-1 btn-secondary bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700" onClick={handleUploadClick}>
+                    <button className="flex-1 btn-secondary" onClick={handleUploadClick}>
                         <ImageIcon size={18} />
                         {t('upload.album')}
                     </button>
@@ -204,19 +204,15 @@ export default function Upload({ onUploadSuccess }) {
             {isUploading && (
                 <div className="mt-6 space-y-2 animate-fade-in">
                     <div className="flex justify-between text-sm font-medium">
-                        <span className="text-zinc-600 dark:text-zinc-400">{status}</span>
-                        <span className="text-accent">{progress}%</span>
+                        <span className="text-[var(--text-secondary)]">{status}</span>
+                        <span className="text-[var(--accent)]">{progress}%</span>
                     </div>
-                    <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="liquid-glass h-2.5 w-full rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-accent transition-all duration-300 relative top-0 left-0"
+                            className="h-full transition-all duration-300 relative top-0 left-0"
                             style={{ width: `${progress}%` }}
                         >
-                            <div className="absolute inset-0 bg-white/20" style={{
-                                backgroundImage: 'linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent)',
-                                backgroundSize: '1rem 1rem',
-                                animation: 'progress 1s linear infinite'
-                            }}></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-2)]"></div>
                         </div>
                     </div>
                 </div>

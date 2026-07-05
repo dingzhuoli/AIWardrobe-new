@@ -146,12 +146,12 @@ export default function Outfit() {
     const shoesItem = getCurrentItem('shoes')
 
     return (
-        <div className="bg-[var(--bg-primary)] px-3 sm:px-4 lg:px-0 pt-3 pb-2 flex flex-col max-w-6xl mx-auto w-full">
+        <div className="px-3 sm:px-4 lg:px-0 pt-3 pb-2 flex flex-col max-w-6xl mx-auto w-full">
             <header className="shrink-0 mb-3">
                 <div className="flex items-center justify-between mb-2">
                     <h2 className="text-[22px] font-serif font-bold tracking-tight text-[var(--text-primary)]">{t('outfit.title')}</h2>
                     <button
-                        className="btn-icon bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-accent hover:text-accent rounded-lg shadow-sm"
+                        className="btn-icon"
                         onClick={shuffleOutfit}
                         title={t('outfit.shuffle')}
                     >
@@ -165,8 +165,8 @@ export default function Outfit() {
                             key={s.key}
                             className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-300 ${
                                 filterSeason === s.key
-                                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-md'
-                                    : 'bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-200'
+                                    ? 'liquid-chip liquid-chip-active'
+                                    : 'liquid-chip'
                                 }`}
                             onClick={() => setFilterSeason(s.key)}
                         >
@@ -178,24 +178,24 @@ export default function Outfit() {
 
             <div className="grid gap-3 lg:grid-cols-12">
                 <section className="card lg:col-span-7 overflow-hidden">
-                    <div className="p-3 sm:p-4 bg-zinc-50/40 dark:bg-zinc-900/30">
-                        <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden p-2 sm:p-3">
+                    <div className="p-3 sm:p-4">
+                        <div className="liquid-panel rounded-[28px] overflow-hidden p-2 sm:p-3">
                             <div className="h-[44vh] min-h-[340px] max-h-[560px] grid grid-rows-[44%_34%_22%] gap-2">
-                                <div className="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-2 flex items-center justify-center">
+                                <div className="media-tile p-2 flex items-center justify-center">
                                     {topItem ? (
                                         <img src={toImageUrl(topItem.image_url)} alt={topItem.item} className="w-full h-full object-contain" />
                                     ) : (
                                         <span className="text-xs text-zinc-400">{t('outfit.noItems', { label: t('outfit.top') })}</span>
                                     )}
                                 </div>
-                                <div className="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-2 flex items-center justify-center">
+                                <div className="media-tile p-2 flex items-center justify-center">
                                     {bottomItem ? (
                                         <img src={toImageUrl(bottomItem.image_url)} alt={bottomItem.item} className="w-full h-full object-contain" />
                                     ) : (
                                         <span className="text-xs text-zinc-400">{t('outfit.noItems', { label: t('outfit.bottom') })}</span>
                                     )}
                                 </div>
-                                <div className="rounded-xl bg-zinc-100 dark:bg-zinc-800 p-2 flex items-center justify-center">
+                                <div className="media-tile p-2 flex items-center justify-center">
                                     {shoesItem ? (
                                         <img src={toImageUrl(shoesItem.image_url)} alt={shoesItem.item} className="w-full h-full object-contain" />
                                     ) : (
@@ -218,7 +218,7 @@ export default function Outfit() {
                                     <div className="text-xs text-zinc-500 uppercase tracking-wide">{t(category.labelKey)}</div>
                                     <div className="flex items-center gap-1.5">
                                         <button
-                                            className="btn-icon border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 disabled:opacity-40"
+                                            className="btn-icon disabled:opacity-40"
                                             onClick={() => shiftCategory(category.key, 'prev')}
                                             disabled={items.length <= 1}
                                             type="button"
@@ -229,7 +229,7 @@ export default function Outfit() {
                                             {items.length ? `${currentIndex + 1}/${items.length}` : '--'}
                                         </span>
                                         <button
-                                            className="btn-icon border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 disabled:opacity-40"
+                                            className="btn-icon disabled:opacity-40"
                                             onClick={() => shiftCategory(category.key, 'next')}
                                             disabled={items.length <= 1}
                                             type="button"
@@ -240,7 +240,7 @@ export default function Outfit() {
                                 </div>
 
                                 <button
-                                    className="w-full rounded-xl bg-zinc-100 dark:bg-zinc-800 h-40 lg:h-44 p-2.5 flex items-center justify-center hover:opacity-90 transition-opacity"
+                                    className="media-tile w-full h-40 lg:h-44 p-2.5 flex items-center justify-center hover:opacity-90 transition-opacity"
                                     onClick={() => item && navigate(`/clothes/${item.id}`)}
                                     type="button"
                                     disabled={!item}

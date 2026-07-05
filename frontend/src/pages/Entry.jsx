@@ -82,7 +82,7 @@ export default function Entry() {
 
     if (editingItem) {
         return (
-            <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col animate-fade-in relative z-20">
+            <div className="min-h-screen flex flex-col animate-fade-in relative z-20">
                 <header className="glass-header px-4 py-4 flex items-center justify-between sticky top-0">
                     <button className="btn-icon" onClick={() => setEditingItem(null)}>
                         <ArrowLeft size={24} />
@@ -99,7 +99,7 @@ export default function Entry() {
                 </header>
 
                 <div className="flex-1 overflow-y-auto pb-24 px-4 space-y-6">
-                    <div className="w-full aspect-square bg-zinc-100 dark:bg-zinc-800 rounded-2xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700 p-6 flex flex-col items-center justify-center mt-4">
+                    <div className="media-tile w-full aspect-square overflow-hidden p-6 flex flex-col items-center justify-center mt-4">
                         <img
                             src={toImageUrl(editingItem.image_url)}
                             alt="Preview"
@@ -108,7 +108,7 @@ export default function Entry() {
                     </div>
 
                     <div className="space-y-6">
-                        <section className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+                        <section className="card p-5 space-y-4">
                             <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 mb-2">{t('entry.basicInfo')}</h3>
 
                             <div className="space-y-1.5">
@@ -143,7 +143,7 @@ export default function Entry() {
                             </div>
                         </section>
 
-                        <section className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+                        <section className="card p-5 space-y-4">
                             <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 mb-2">{t('entry.features')}</h3>
 
                             <div className="space-y-1.5">
@@ -189,7 +189,7 @@ export default function Entry() {
                             </div>
                         </section>
 
-                        <section className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+                        <section className="card p-5 space-y-4">
                             <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5 mb-2">
                                 <FileText className="text-accent" size={16} /> {t('entry.description')}
                             </h3>
@@ -209,11 +209,11 @@ export default function Entry() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] p-4 sm:px-6 lg:px-8 flex flex-col pt-safe">
+        <div className="min-h-screen p-4 sm:px-6 lg:px-8 flex flex-col pt-safe">
             <header className="flex items-center justify-between mb-6 mt-4 max-w-6xl mx-auto w-full">
                 <h1 className="text-3xl font-serif font-bold tracking-tight text-[var(--text-primary)]">{t('entry.title')}</h1>
                 <button
-                    className="p-2.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 rounded-xl shadow-sm transition-all hover:-translate-y-0.5"
+                    className="btn-icon"
                     onClick={() => setShowSettings(true)}
                 >
                     <SettingsIcon className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200" size={20} />
@@ -227,7 +227,7 @@ export default function Entry() {
                         <h2 className="mt-1 text-xl font-serif font-bold text-zinc-900 dark:text-zinc-100">{t('entry.heroTitle')}</h2>
                         <p className="mt-2 text-sm text-zinc-500 leading-relaxed">{t('entry.heroSubtitle')}</p>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                    <div className="liquid-glass w-10 h-10 rounded-full text-[var(--accent)] flex items-center justify-center shrink-0">
                         <Sparkles size={18} />
                     </div>
                 </div>
@@ -244,15 +244,15 @@ export default function Entry() {
                 </div>
 
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-2 py-2">
+                    <div className="subtle-panel px-2 py-2">
                         <div className="text-[10px] text-zinc-400">01</div>
                         <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">{t('entry.stepUpload')}</div>
                     </div>
-                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-2 py-2">
+                    <div className="subtle-panel px-2 py-2">
                         <div className="text-[10px] text-zinc-400">02</div>
                         <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">{t('entry.stepEdit')}</div>
                     </div>
-                    <div className="rounded-lg bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-2 py-2">
+                    <div className="subtle-panel px-2 py-2">
                         <div className="text-[10px] text-zinc-400">03</div>
                         <div className="text-xs text-zinc-600 dark:text-zinc-300 mt-0.5">{t('entry.stepRecommend')}</div>
                     </div>

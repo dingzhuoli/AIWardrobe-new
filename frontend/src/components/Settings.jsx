@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../contexts/ThemeContext'
-import { Sun, Moon, Globe, Sparkles, MapPin } from 'lucide-react'
+import { Sun, Moon, Globe, Sparkles, MapPin, X, ChevronDown, List, Cable } from 'lucide-react'
 import { API_BASE } from '../utils/api'
 
 const LANGUAGES = [
@@ -353,15 +353,15 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/35 backdrop-blur-md transition-opacity" onClick={onClose}>
             <div
-                className="bg-[var(--bg-primary)] w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col shadow-xl animate-[slideUp_0.3s_ease-out]"
+                className="liquid-sheet w-full max-w-lg rounded-t-[30px] sm:rounded-[30px] max-h-[90vh] sm:max-h-[85vh] flex flex-col animate-[slideUp_0.3s_ease-out] overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sm:rounded-t-2xl px-6">
-                    <h2 className="text-xl font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{t('settings.title')}</h2>
-                    <button className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors" onClick={onClose}>
-                        ✕
+                <div className="flex items-center justify-between p-5 border-b border-[var(--line)] px-6">
+                    <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">{t('settings.title')}</h2>
+                    <button className="btn-icon !min-h-9 !min-w-9 !p-0" onClick={onClose} aria-label={t('settings.cancel')}>
+                        <X size={18} />
                     </button>
                 </div>
 
@@ -466,15 +466,15 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 />
                                 <button
                                     type="button"
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-md text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                                    className="btn-icon absolute right-2 top-1/2 -translate-y-1/2 !h-7 !min-h-7 !w-7 !min-w-7 !p-0"
                                     onClick={() => setShowLocationDropdown(open => !open)}
                                     aria-label={t('settings.defaultCity')}
                                 >
-                                    ▾
+                                    <ChevronDown size={15} />
                                 </button>
 
                                 {showLocationDropdown && (
-                                    <div className="absolute z-40 mt-1 w-full max-h-56 overflow-y-auto rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg">
+                                    <div className="liquid-panel absolute z-40 mt-1 w-full max-h-56 overflow-y-auto rounded-2xl">
                                         {locationSuggestions.length > 0 ? (
                                             locationSuggestions.map(option => (
                                                 <button
@@ -565,7 +565,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                             {models.map(m => (
                                                 <option key={m.id} value={m.id}>{m.name}</option>
                                             ))}
-                                            <option value="__custom__">⚙️ {t('settings.manualInput')}</option>
+                                            <option value="__custom__">{t('settings.manualInput')}</option>
                                         </select>
                                     </div>
                                 ) : (
@@ -580,11 +580,11 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                         />
                                         {models.length > 0 && (
                                             <button
-                                                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-md"
+                                                className="btn-icon absolute right-2 top-1/2 -translate-y-1/2 !h-8 !min-h-8 !w-8 !min-w-8 !p-0"
                                                 onClick={() => setShowModelSelect(true)}
                                                 title={t('settings.switchToList')}
                                             >
-                                                📋
+                                                <List size={15} />
                                             </button>
                                         )}
                                     </div>
@@ -605,7 +605,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                 onClick={handleTestConnection}
                                 disabled={testing}
                             >
-                                {testing ? <span className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-600 rounded-full animate-spin"></span> : '🔗'}
+                                {testing ? <span className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-600 rounded-full animate-spin"></span> : <Cable size={16} />}
                                 {testing ? t('settings.testing') : testResult ? testResult.message : t('settings.testConnection')}
                             </button>
                         </div>
@@ -769,11 +769,11 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                     <div className="pb-4" />
                 </div>
 
-                <div className="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 sm:rounded-b-2xl flex gap-3 pb-safe">
-                    <button className="flex-1 py-3 rounded-xl font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors" onClick={onClose}>
+                <div className="p-5 border-t border-[var(--line)] flex gap-3 pb-safe">
+                    <button className="btn-secondary flex-1" onClick={onClose}>
                         {t('settings.cancel')}
                     </button>
-                    <button className="flex-[2] py-3 rounded-xl font-medium bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 shadow-sm hover:bg-black dark:hover:bg-white transition-colors" onClick={() => handleSave(true)}>
+                    <button className="btn-primary flex-[2]" onClick={() => handleSave(true)}>
                         {t('settings.saveSettings')}
                     </button>
                 </div>

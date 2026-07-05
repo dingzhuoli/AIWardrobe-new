@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, RefreshCw, Mic, MicOff } from 'lucide-react'
+import { Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Moon, Sparkles, RefreshCw, Mic, MicOff, Sun, Tornado } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { useRecommendation } from '../contexts/RecommendationContext'
 
@@ -26,55 +26,23 @@ export default function Recommendation() {
         purchaseSuggestions,
         goalRaw,
         goalNormalized,
-        mode,
         selectedCity,
         fetchRecommendation
     } = useRecommendation()
 
-    const [displayedRecommendation, setDisplayedRecommendation] = useState('')
     const [goalInput, setGoalInput] = useState('')
     const [selectedMode, setSelectedMode] = useState('balanced')
     const [isListening, setIsListening] = useState(false)
-    const [speechSupported, setSpeechSupported] = useState(false)
+    const [speechSupported] = useState(() => Boolean(window.SpeechRecognition || window.webkitSpeechRecognition))
     const [speechError, setSpeechError] = useState('')
     const recognitionRef = useRef(null)
-
-    useEffect(() => {
-        if (!recommendation) {
-            setDisplayedRecommendation('')
-            return
-        }
-
-        const chars = Array.from(recommendation)
-        const step = 4
-        let index = 0
-        setDisplayedRecommendation('')
-
-        const timer = setInterval(() => {
-            if (index < chars.length) {
-                index = Math.min(index + step, chars.length)
-                setDisplayedRecommendation(chars.slice(0, index).join(''))
-            } else {
-                clearInterval(timer)
-            }
-        }, 45)
-
-        return () => clearInterval(timer)
-    }, [recommendation])
-
-    useEffect(() => {
-        if (mode) {
-            setSelectedMode(mode)
-        }
-    }, [mode])
+    const displayedRecommendation = recommendation
 
     useEffect(() => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
         if (!SpeechRecognition) {
-            setSpeechSupported(false)
             return
         }
-        setSpeechSupported(true)
 
         const recognition = new SpeechRecognition()
         recognition.continuous = false
@@ -165,21 +133,21 @@ export default function Recommendation() {
         void fetchRecommendation(selectedCity.id, selectedCity.name, goalInput, selectedMode)
     }
 
-    const getWeatherIcon = (icon) => {
+    const getWeatherIconComponent = (icon) => {
         const iconMap = {
-            '100': '☀️', '101': '☁️', '102': '⛅', '103': '⛅', '104': '☁️',
-            '150': '🌙', '300': '🌦️', '301': '⛈️', '302': '⛈️', '303': '⛈️',
-            '304': '🌨️', '305': '🌧️', '306': '🌧️', '307': '🌧️', '308': '🌧️',
-            '309': '🌦️', '310': '⛈️', '311': '⛈️', '312': '⛈️', '313': '🌨️',
-            '314': '🌧️', '315': '🌧️', '316': '🌧️', '317': '⛈️', '318': '⛈️',
-            '399': '🌧️', '400': '🌨️', '401': '🌨️', '402': '❄️', '403': '❄️',
-            '404': '🌨️', '405': '🌨️', '406': '🌨️', '407': '❄️', '408': '🌨️',
-            '409': '❄️', '410': '❄️', '499': '❄️', '500': '🌫️', '501': '🌫️',
-            '502': '🌫️', '503': '🌪️', '504': '🌪️', '507': '🌪️', '508': '🌪️',
-            '509': '🌫️', '510': '🌫️', '511': '🌫️', '512': '🌫️', '513': '🌫️',
-            '514': '🌫️', '515': '🌫️'
+            '100': Sun, '101': Cloud, '102': CloudSun, '103': CloudSun, '104': Cloud,
+            '150': Moon, '300': CloudRain, '301': CloudLightning, '302': CloudLightning, '303': CloudLightning,
+            '304': CloudSnow, '305': CloudRain, '306': CloudRain, '307': CloudRain, '308': CloudRain,
+            '309': CloudRain, '310': CloudLightning, '311': CloudLightning, '312': CloudLightning, '313': CloudSnow,
+            '314': CloudRain, '315': CloudRain, '316': CloudRain, '317': CloudLightning, '318': CloudLightning,
+            '399': CloudRain, '400': CloudSnow, '401': CloudSnow, '402': CloudSnow, '403': CloudSnow,
+            '404': CloudSnow, '405': CloudSnow, '406': CloudSnow, '407': CloudSnow, '408': CloudSnow,
+            '409': CloudSnow, '410': CloudSnow, '499': CloudSnow, '500': CloudFog, '501': CloudFog,
+            '502': CloudFog, '503': Tornado, '504': Tornado, '507': Tornado, '508': Tornado,
+            '509': CloudFog, '510': CloudFog, '511': CloudFog, '512': CloudFog, '513': CloudFog,
+            '514': CloudFog, '515': CloudFog
         }
-        return iconMap[icon] || '🌤️'
+        return iconMap[icon] || CloudSun
     }
 
     const renderClothingCard = (item, label, reason) => {
@@ -188,11 +156,11 @@ export default function Recommendation() {
         }
         const reasonText = reason || t('recommendation.reasonFallback')
         return (
-            <div className="card group overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
-                    <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">{label}</span>
+            <div className="card group overflow-hidden">
+                <div className="px-3 py-2 border-b border-[var(--line)]">
+                    <span className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">{label}</span>
                 </div>
-                <div className="aspect-square bg-zinc-100/50 dark:bg-zinc-800/50 p-4 border-b border-zinc-100 dark:border-zinc-800 relative overflow-hidden">
+                <div className="media-tile aspect-square p-4 border-b border-[var(--line)] relative overflow-hidden">
                     {item.image_url ? (
                         <img
                             src={toImageUrl(item.image_url)}
@@ -200,28 +168,26 @@ export default function Recommendation() {
                             className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform duration-500"
                         />
                     ) : (
-                        <div className="w-full h-full rounded-lg bg-zinc-100 dark:bg-zinc-800" />
+                        <div className="w-full h-full rounded-lg bg-[var(--accent-soft)]" />
                     )}
                 </div>
                 <div className="p-3">
-                    <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">{item.item}</div>
+                    <div className="text-sm font-medium text-[var(--text-primary)] truncate">{item.item}</div>
                     {item.description && (
                         <div className="text-xs text-zinc-400 mt-0.5 line-clamp-1">{item.description}</div>
                     )}
-                    <div className="text-xs text-zinc-500 mt-2 leading-relaxed">{reasonText}</div>
+                    <div className="text-xs text-[var(--text-secondary)] mt-2 leading-relaxed">{reasonText}</div>
                 </div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col pt-safe pb-24 relative overflow-hidden">
-            <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-blue-100 dark:bg-blue-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 pointer-events-none"></div>
-            <div className="absolute bottom-[20%] left-[-10%] w-72 h-72 bg-purple-100 dark:bg-purple-900/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-30 pointer-events-none"></div>
+        <div className="min-h-screen flex flex-col pt-safe pb-24 relative overflow-hidden">
 
             {!weather && !loading && (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 z-10 text-center animate-fade-in -mt-8">
-                    <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center text-accent mb-6 shadow-[0_0_40px_rgba(37,99,235,0.2)]">
+                    <div className="liquid-glass w-20 h-20 rounded-full flex items-center justify-center text-[var(--accent)] mb-6">
                         <Sparkles size={36} />
                     </div>
                     <h2 className="text-2xl font-serif font-bold text-zinc-900 dark:text-zinc-100 mb-3 tracking-tight leading-tight">{t('recommendation.getTitle')}<br />{t('recommendation.getSubtitle')}</h2>
@@ -237,8 +203,8 @@ export default function Recommendation() {
                                     type="button"
                                     className={`px-2 py-2 rounded-lg text-xs border transition-colors ${
                                         selectedMode === option
-                                            ? 'border-accent bg-accent/10 text-accent'
-                                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300'
+                                            ? 'liquid-chip liquid-chip-active'
+                                            : 'liquid-chip'
                                     }`}
                                     disabled={loading}
                                     onClick={() => setSelectedMode(option)}
@@ -287,7 +253,7 @@ export default function Recommendation() {
                     </div>
 
                     <button
-                        className="btn-primary w-full max-w-xs shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 py-3.5 rounded-xl border-none focus:ring-blue-500/50 disabled:opacity-60"
+                        className="btn-primary w-full max-w-xs py-3.5 disabled:opacity-60"
                         onClick={generateRecommendation}
                         disabled={loading}
                     >
@@ -303,7 +269,7 @@ export default function Recommendation() {
             {loading && (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 z-10">
                     <div className="w-16 h-16 relative flex items-center justify-center mb-6">
-                        <div className="absolute inset-0 border-4 border-zinc-100 dark:border-zinc-800 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-[var(--line)] rounded-full"></div>
                         <div className="absolute inset-0 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
                         <Sparkles className="text-accent animate-pulse" size={20} />
                     </div>
@@ -314,13 +280,16 @@ export default function Recommendation() {
             {!loading && weather && (
                 <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 z-10 space-y-6 max-w-6xl mx-auto w-full">
                     {error && (
-                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/40 rounded-2xl p-3 text-xs text-red-700 dark:text-red-200">
+                        <div className="subtle-panel p-3 text-xs text-red-700 dark:text-red-200">
                             {error}
                         </div>
                     )}
-                    <div className="bg-gradient-to-br from-blue-500 to-accent text-white p-6 rounded-3xl shadow-lg relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-8 text-8xl opacity-10 blur-sm mix-blend-overlay group-hover:scale-110 transition-transform duration-700 pointer-events-none">
-                            {getWeatherIcon(weather.icon)}
+                    <div className="liquid-panel text-white p-6 rounded-[30px] relative overflow-hidden group bg-[linear-gradient(135deg,var(--accent),var(--accent-2))]">
+                        <div className="absolute -right-4 -top-8 opacity-20 blur-[1px] mix-blend-overlay group-hover:scale-110 transition-transform duration-700 pointer-events-none">
+                            {(() => {
+                                const WeatherIcon = getWeatherIconComponent(weather.icon)
+                                return <WeatherIcon size={118} strokeWidth={1.35} />
+                            })()}
                         </div>
                         <div className="relative z-10 flex items-start flex-col">
                             <div className="flex items-end gap-3 mb-6">
@@ -345,23 +314,23 @@ export default function Recommendation() {
 
                     {horoscope && (
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                            <div className="card p-4">
                                 <div className="text-xs text-zinc-400">{t('recommendation.horoscopeSign')}</div>
                                 <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.zodiac_name || t('home.unknownZodiac')}</div>
                             </div>
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                            <div className="card p-4">
                                 <div className="text-xs text-zinc-400">{t('recommendation.mood')}</div>
                                 <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.mood}</div>
                             </div>
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                            <div className="card p-4">
                                 <div className="text-xs text-zinc-400">{t('recommendation.luckyColor')}</div>
                                 <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.lucky_color}</div>
                             </div>
-                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                            <div className="card p-4">
                                 <div className="text-xs text-zinc-400">{t('recommendation.luckyNumber')}</div>
                                 <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-1">{horoscope.lucky_number}</div>
                             </div>
-                            <div className="col-span-2 sm:col-span-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                            <div className="card col-span-2 sm:col-span-4 p-4">
                                 <div className="text-xs text-zinc-400">{t('recommendation.horoscopeSummary')}</div>
                                 <div className="text-sm text-zinc-700 dark:text-zinc-300 mt-1 leading-relaxed">{horoscope.summary}</div>
                             </div>
@@ -369,7 +338,7 @@ export default function Recommendation() {
                     )}
 
                     {(goalRaw || goalNormalized) && (
-                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                        <div className="card p-4">
                             <div className="text-xs text-zinc-400 mb-1">{t('recommendation.goalUsed')}</div>
                             <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                                 {goalRaw || goalNormalized}
@@ -378,7 +347,7 @@ export default function Recommendation() {
                     )}
 
                     {temperatureRule && (
-                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                        <div className="card p-4">
                             <div className="text-xs text-zinc-400 mb-1">{t('recommendation.temperatureRule')}</div>
                             <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{temperatureRule.label}</div>
                             <div className="text-xs text-zinc-500 mt-2">{temperatureRule.advice}</div>
@@ -399,18 +368,15 @@ export default function Recommendation() {
                             </button>
                         </div>
 
-                        <div className="bg-white dark:bg-zinc-900 p-6 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+                        <div className="card p-6">
                             <div className="prose prose-sm prose-zinc dark:prose-invert max-w-none text-zinc-600 dark:text-zinc-400 leading-relaxed font-serif tracking-wide">
                                 <ReactMarkdown>{displayedRecommendation}</ReactMarkdown>
-                                {displayedRecommendation.length < recommendation.length && (
-                                    <span className="inline-block w-1.5 h-4 ml-1 bg-accent/70 animate-pulse align-middle"></span>
-                                )}
                             </div>
                         </div>
                     </div>
 
                     {outfitSummary && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 rounded-2xl p-4 text-sm text-blue-700 dark:text-blue-200">
+                        <div className="subtle-panel p-4 text-sm text-blue-700 dark:text-blue-200">
                             <span className="font-semibold">{t('recommendation.outfitSummary')}:</span> {outfitSummary}
                         </div>
                     )}
@@ -446,7 +412,7 @@ export default function Recommendation() {
                             <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.accessories')}</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {suggestedAccessories.map((accessory, index) => (
-                                    <div key={`${accessory.name}-${index}`} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
+                                    <div key={`${accessory.name}-${index}`} className="card p-4">
                                         <div className="flex items-start justify-between gap-3">
                                             <div>
                                                 <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{accessory.name}</div>
@@ -461,7 +427,7 @@ export default function Recommendation() {
                                             </span>
                                         </div>
                                         {accessory.item?.image_url && (
-                                            <div className="mt-3 h-24 bg-zinc-100/60 dark:bg-zinc-800/50 rounded-xl p-2">
+                                            <div className="media-tile mt-3 h-24 p-2">
                                                 <img
                                                     src={toImageUrl(accessory.item.image_url)}
                                                     alt={accessory.name}
@@ -480,7 +446,7 @@ export default function Recommendation() {
                             <h3 className="font-serif font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-lg pl-1">{t('recommendation.purchaseFallback')}</h3>
                             <div className="space-y-3">
                                 {purchaseSuggestions.map((suggestion, index) => (
-                                    <div key={`${suggestion.category}-${index}`} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
+                                    <div key={`${suggestion.category}-${index}`} className="card p-4">
                                         <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{suggestion.title}</div>
                                         <div className="text-xs text-zinc-500 mt-1 leading-relaxed">{suggestion.reason}</div>
                                         {suggestion.keywords?.length > 0 && (

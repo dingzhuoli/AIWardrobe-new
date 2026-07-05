@@ -11,8 +11,8 @@ import './index.css'
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] relative">
-        <div className="mx-auto w-full max-w-screen-2xl pb-24 lg:pb-8 lg:pt-20 lg:px-6">
+      <div className="app-shell text-[var(--text-primary)]">
+        <div className="app-content mx-auto w-full max-w-screen-2xl pb-28 lg:pb-10 lg:pt-24 lg:px-6">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/entry" element={<Entry />} />
