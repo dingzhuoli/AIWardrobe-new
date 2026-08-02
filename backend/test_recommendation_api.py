@@ -141,6 +141,14 @@ class RecommendationApiTests(unittest.TestCase):
             config_store._CONFIG_CACHE = backup_cache
             config_store._CONFIG_MTIME = backup_mtime
 
+    def test_config_reports_local_rembg_install_status(self):
+        with patch("api.config.is_local_rembg_available", return_value=True):
+            client = TestClient(main.app)
+            response = client.get("/api/config")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(response.json()["local_rembg_installed"], True)
+
     def test_get_weather_uses_db_cache_before_provider(self):
         async def run_case():
             cache_key = build_weather_cache_key("121.4737,31.2304")
@@ -199,6 +207,28 @@ class RecommendationApiTests(unittest.TestCase):
             self.assertIsNotNone(weather)
             self.assertEqual(weather.condition, "阴")
             self.assertEqual(weather.temperature, 16.0)
+
+        _run_with_initialized_temp_db(run_case)
+
+    def test_resolve_location_reuses_cached_text_resolution(self):
+        async def run_case():
+            city = weather_service.CityInfo(
+                name="上海",
+                id="121.4737,31.2304",
+                adm1="上海市",
+                adm2="上海",
+                country="中国",
+                lat="31.2304",
+                lon="121.4737",
+            )
+
+            with patch("services.weather.search_city", new=AsyncMock(return_value=[city])) as search_mock:
+                first = await weather_service.resolve_location("上海, 上海市, 中国")
+                second = await weather_service.resolve_location("上海, 上海市, 中国")
+
+            self.assertEqual(first, ("121.4737,31.2304", "上海 · 上海市 · 中国"))
+            self.assertEqual(second, first)
+            self.assertEqual(search_mock.await_count, 1)
 
         _run_with_initialized_temp_db(run_case)
 

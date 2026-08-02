@@ -7,14 +7,22 @@ from fastapi import APIRouter, HTTPException
 from domain.config import LLMConfigUpdate, AvailableModel, ModelListResponse
 from storage.config_store import load_config, update_config, get_masked_config
 from services.openai_compatible import fetch_available_models
+from services.segment import is_local_rembg_available
 
 router = APIRouter()
+
+
+def get_config_response() -> dict:
+    """获取配置响应，并附带运行时依赖状态。"""
+    config = get_masked_config()
+    config["local_rembg_installed"] = is_local_rembg_available()
+    return config
 
 
 @router.get("/config")
 async def get_config():
     """获取当前 LLM 配置（API Key 脱敏）"""
-    return get_masked_config()
+    return get_config_response()
 
 
 @router.post("/config")
@@ -38,7 +46,7 @@ async def set_config(config_update: LLMConfigUpdate):
         return {
             "success": True,
             "message": "配置已更新",
-            "config": get_masked_config()
+            "config": get_config_response()
         }
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -49,6 +57,14 @@ async def set_config(config_update: LLMConfigUpdate):
 @router.post("/install-rembg")
 async def install_rembg_dependencies():
     """一键安装本地背景移除依赖 rembg + onnxruntime。"""
+    if is_local_rembg_available():
+        return {
+            "success": True,
+            "message": "rembg 已安装，可使用本地模式",
+            "local_rembg_installed": True,
+            "output": "",
+        }
+
     process = await asyncio.create_subprocess_exec(
         sys.executable,
         "-m",
@@ -63,16 +79,19 @@ async def install_rembg_dependencies():
     output = ((stdout or b"") + (stderr or b"")).decode("utf-8", errors="ignore")
     tail_output = output[-4000:] if output else ""
 
-    if process.returncode == 0:
+    local_rembg_installed = is_local_rembg_available()
+    if process.returncode == 0 and local_rembg_installed:
         return {
             "success": True,
             "message": "安装成功，可使用本地 rembg",
+            "local_rembg_installed": True,
             "output": tail_output,
         }
 
     return {
         "success": False,
         "message": "安装失败，请稍后重试或使用 remove.bg API",
+        "local_rembg_installed": local_rembg_installed,
         "output": tail_output,
     }
 

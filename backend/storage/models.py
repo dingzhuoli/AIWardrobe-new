@@ -67,3 +67,19 @@ CREATE INDEX IF NOT EXISTS idx_weather_cache_key_bucket ON weather_cache(locatio
 WEATHER_CACHE_UPDATED_AT_INDEX_SQL = """
 CREATE INDEX IF NOT EXISTS idx_weather_cache_updated_at ON weather_cache(updated_at);
 """
+
+# 地点解析缓存：文本地点 -> 坐标 + 展示名
+LOCATION_CACHE_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS location_cache (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    query_key TEXT NOT NULL UNIQUE,
+    resolved_location TEXT NOT NULL,
+    display_location TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+LOCATION_CACHE_INDEX_SQL = """
+CREATE INDEX IF NOT EXISTS idx_location_cache_query_key ON location_cache(query_key);
+"""

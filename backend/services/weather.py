@@ -9,7 +9,14 @@ from typing import Optional, List
 import httpx
 from pydantic import BaseModel
 
-from storage.db import get_weather_cache, get_latest_weather_cache, upsert_weather_cache, cleanup_weather_cache
+from storage.db import (
+    get_location_cache,
+    get_weather_cache,
+    get_latest_weather_cache,
+    upsert_location_cache,
+    upsert_weather_cache,
+    cleanup_weather_cache,
+)
 
 
 class CityInfo(BaseModel):
@@ -103,6 +110,10 @@ def build_weather_cache_bucket(now: Optional[datetime] = None) -> str:
 
 def build_weather_cache_key(resolved_location: str) -> str:
     return (resolved_location or "").strip().lower()
+
+
+def build_location_cache_key(location: str) -> str:
+    return normalize_location_query(location) or (location or "").strip().lower()
 
 
 def normalize_location_query(query: str) -> str:
@@ -625,10 +636,17 @@ async def resolve_location(location: str) -> tuple[str, str]:
         latitude, longitude = parsed_coordinate
         return format_coordinate_id(latitude, longitude), raw_location
 
+    cache_key = build_location_cache_key(raw_location)
+    cached_location = await get_location_cache(cache_key)
+    if cached_location:
+        return cached_location["resolved_location"], cached_location["display_location"]
+
     cities = await search_city(raw_location, limit=1)
     if cities:
         city = cities[0]
-        return city.id, format_city_display_name(city)
+        display_location = format_city_display_name(city)
+        await upsert_location_cache(cache_key, city.id, display_location)
+        return city.id, display_location
 
     return raw_location, raw_location
 

@@ -242,6 +242,7 @@
     "localRembgInstall": "pip install rembg onnxruntime",
     "installRembg": "rembg をインストール",
     "installingRembg": "インストール中...",
+    "rembgInstalled": "rembg インストール済み",
     "installRembgSuccess": "rembg のインストールに成功しました。ローカルモードを利用できます。",
     "installRembgFailed": "インストール失敗。再試行するか remove.bg API を使用してください。",
     "removebgDesc": "プロ品質、API Keyが必要",

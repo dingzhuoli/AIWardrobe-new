@@ -242,6 +242,7 @@
     "localRembgInstall": "pip install rembg onnxruntime",
     "installRembg": "Install rembg",
     "installingRembg": "Installing...",
+    "rembgInstalled": "rembg installed",
     "installRembgSuccess": "rembg installed successfully. You can use local mode now.",
     "installRembgFailed": "Install failed. Please retry or use remove.bg API.",
     "removebgDesc": "Professional quality, requires API Key",

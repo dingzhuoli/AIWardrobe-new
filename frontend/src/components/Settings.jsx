@@ -26,6 +26,10 @@ const ZODIAC_SIGNS = [
 ]
 
 const DEFAULT_LOCATION = '上海, 上海市, 中国'
+const DEFAULT_REFRESH_CONFIG = {
+    weather_location: DEFAULT_LOCATION,
+    zodiac_sign: ''
+}
 const LOCATION_ID_REGEX = /^\d{9}$/
 const COORDINATE_LOCATION_REGEX = /^\s*-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?\s*$/
 const LOCATION_PART_SEPARATOR_REGEX = /[，,]+/
@@ -37,6 +41,11 @@ const LOCATION_PRESETS = [
     '广州, 广东, 中国',
     '深圳, 广东, 中国'
 ]
+
+const getRefreshConfig = (config) => ({
+    weather_location: (config.weather_location || '').trim() || DEFAULT_LOCATION,
+    zodiac_sign: config.zodiac_sign || ''
+})
 
 const formatLocationCandidate = (city) => {
     const name = (city?.name || '').trim()
@@ -97,6 +106,8 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     const [searchingLocations, setSearchingLocations] = useState(false)
     const [showLocationDropdown, setShowLocationDropdown] = useState(false)
     const [installingRembg, setInstallingRembg] = useState(false)
+    const [localRembgInstalled, setLocalRembgInstalled] = useState(false)
+    const [initialRefreshConfig, setInitialRefreshConfig] = useState(DEFAULT_REFRESH_CONFIG)
     const locationPickerRef = useRef(null)
 
     useEffect(() => {
@@ -196,6 +207,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
             const response = await fetch(`${API_BASE}/config`, { signal })
             if (response.ok) {
                 const data = await response.json()
+                const refreshConfig = getRefreshConfig(data)
                 setConfig(prev => ({
                     ...prev,
                     api_base: data.api_base || 'https://api.openai.com/v1',
@@ -204,12 +216,14 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                     tryon_provider: data.tryon_provider || 'disabled',
                     tryon_api_url: data.tryon_api_url || '',
                     tryon_model: data.tryon_model || '',
-                    weather_location: data.weather_location || DEFAULT_LOCATION,
-                    zodiac_sign: data.zodiac_sign || ''
+                    weather_location: refreshConfig.weather_location,
+                    zodiac_sign: refreshConfig.zodiac_sign
                 }))
+                setInitialRefreshConfig(refreshConfig)
                 setHasExistingKey(data.has_api_key)
                 setHasRemoveBgKey(data.has_removebg_key)
                 setHasTryonApiKey(data.has_tryon_api_key)
+                setLocalRembgInstalled(Boolean(data.local_rembg_installed))
             }
         } catch (error) {
             if (error.name !== 'AbortError') {
@@ -273,6 +287,9 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                 method: 'POST'
             })
             const data = await response.json().catch(() => ({}))
+            if (data.success) {
+                setLocalRembgInstalled(Boolean(data.local_rembg_installed ?? true))
+            }
             setTestResult({
                 success: Boolean(data.success),
                 message: data.message || (data.success ? t('settings.installRembgSuccess') : t('settings.installRembgFailed'))
@@ -328,8 +345,19 @@ const Settings = ({ isOpen, onClose, onSave }) => {
             })
 
             if (response.ok) {
+                const nextRefreshConfig = {
+                    weather_location: normalizedLocation,
+                    zodiac_sign: config.zodiac_sign || ''
+                }
+                const refreshChanges = {
+                    ...nextRefreshConfig,
+                    weatherLocationChanged: nextRefreshConfig.weather_location !== initialRefreshConfig.weather_location,
+                    zodiacSignChanged: nextRefreshConfig.zodiac_sign !== initialRefreshConfig.zodiac_sign
+                }
+
                 if (closeAfter) {
-                    onSave && onSave()
+                    setInitialRefreshConfig(nextRefreshConfig)
+                    onSave && onSave(refreshChanges)
                     onClose()
                 }
                 return true
@@ -714,9 +742,13 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                                             type="button"
                                             className="btn-secondary !py-1.5 !px-2 text-xs"
                                             onClick={handleInstallRembg}
-                                            disabled={installingRembg}
+                                            disabled={installingRembg || localRembgInstalled}
                                         >
-                                            {installingRembg ? t('settings.installingRembg') : t('settings.installRembg')}
+                                            {localRembgInstalled
+                                                ? t('settings.rembgInstalled')
+                                                : installingRembg
+                                                    ? t('settings.installingRembg')
+                                                    : t('settings.installRembg')}
                                         </button>
                                         <code className="inline-block rounded bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-700 dark:text-zinc-200">{t('settings.localRembgInstall')}</code>
                                     </div>

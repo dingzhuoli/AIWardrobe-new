@@ -15,6 +15,8 @@ from storage.models import (
     WEATHER_CACHE_TABLE_SQL,
     WEATHER_CACHE_INDEX_SQL,
     WEATHER_CACHE_UPDATED_AT_INDEX_SQL,
+    LOCATION_CACHE_TABLE_SQL,
+    LOCATION_CACHE_INDEX_SQL,
 )
 
 # 数据库文件路径
@@ -38,6 +40,8 @@ async def init_db():
         await db.execute(WEATHER_CACHE_TABLE_SQL)
         await db.execute(WEATHER_CACHE_INDEX_SQL)
         await db.execute(WEATHER_CACHE_UPDATED_AT_INDEX_SQL)
+        await db.execute(LOCATION_CACHE_TABLE_SQL)
+        await db.execute(LOCATION_CACHE_INDEX_SQL)
         await db.commit()
 
 
@@ -336,6 +340,71 @@ async def cleanup_weather_cache(max_rows: int = 1000) -> None:
             (max_rows,),
         )
         await db.commit()
+
+
+async def get_location_cache(query_key: str) -> Optional[dict[str, Any]]:
+    """按归一化地点文本获取解析缓存。"""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """
+            SELECT * FROM location_cache
+            WHERE query_key = ?
+            LIMIT 1
+            """,
+            (query_key,),
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        return {
+            "query_key": row["query_key"],
+            "resolved_location": row["resolved_location"],
+            "display_location": row["display_location"],
+        }
+
+
+async def upsert_location_cache(
+    query_key: str,
+    resolved_location: str,
+    display_location: str,
+) -> int:
+    """写入或更新地点解析缓存。"""
+    async with aiosqlite.connect(DB_PATH) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            """
+            SELECT id FROM location_cache
+            WHERE query_key = ?
+            LIMIT 1
+            """,
+            (query_key,),
+        )
+        existing = await cursor.fetchone()
+
+        if existing:
+            await db.execute(
+                """
+                UPDATE location_cache
+                SET resolved_location = ?,
+                    display_location = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (resolved_location, display_location, existing["id"]),
+            )
+            await db.commit()
+            return int(existing["id"])
+
+        cursor = await db.execute(
+            """
+            INSERT INTO location_cache (query_key, resolved_location, display_location)
+            VALUES (?, ?, ?)
+            """,
+            (query_key, resolved_location, display_location),
+        )
+        await db.commit()
+        return int(cursor.lastrowid)
 
 
 def _row_to_clothes_item(row: aiosqlite.Row) -> ClothesItem:

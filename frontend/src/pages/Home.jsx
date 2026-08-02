@@ -89,23 +89,44 @@ export default function Home() {
         }
     }
 
-    const fetchDashboard = async (location = defaultLocation) => {
+    const fetchWeather = async (location = defaultLocation) => {
         setWeatherLoading(true)
-        setWardrobeLoading(true)
-        setHoroscopeLoading(true)
-
-        const weatherTask = (async () => {
-            try {
-                const weatherRes = await fetch(`${API_BASE}/weather?location=${encodeURIComponent(location)}`)
-                if (weatherRes.ok) {
-                    setWeather(await weatherRes.json())
-                }
-            } catch (error) {
-                console.error('Failed to fetch weather:', error)
-            } finally {
-                setWeatherLoading(false)
+        try {
+            const weatherRes = await fetch(`${API_BASE}/weather?location=${encodeURIComponent(location)}`)
+            if (weatherRes.ok) {
+                setWeather(await weatherRes.json())
             }
-        })()
+        } catch (error) {
+            console.error('Failed to fetch weather:', error)
+        } finally {
+            setWeatherLoading(false)
+        }
+    }
+
+    const refreshHoroscope = async (location = defaultLocation) => {
+        setHoroscopeLoading(true)
+        try {
+            const horoscopeData = await fetchHoroscope(location, false)
+            if (horoscopeData) {
+                setHoroscope(horoscopeData)
+                const shouldInfer = horoscopeData.llm_status === 'pending'
+                if (horoscopeData.is_configured && shouldInfer) {
+                    void runHoroscopeInference(location)
+                } else {
+                    setHoroscopeInferenceLoading(false)
+                }
+            } else {
+                setHoroscopeInferenceLoading(false)
+            }
+        } catch (error) {
+            console.error('Failed to fetch horoscope:', error)
+        } finally {
+            setHoroscopeLoading(false)
+        }
+    }
+
+    const fetchDashboard = async (location = defaultLocation) => {
+        setWardrobeLoading(true)
 
         const wardrobeTask = (async () => {
             try {
@@ -126,26 +147,7 @@ export default function Home() {
             }
         })()
 
-        const horoscopeTask = (async () => {
-            try {
-                const horoscopeData = await fetchHoroscope(location, false)
-                if (horoscopeData) {
-                    setHoroscope(horoscopeData)
-                    const shouldInfer = horoscopeData.llm_status === 'pending'
-                    if (horoscopeData.is_configured && shouldInfer) {
-                        void runHoroscopeInference(location)
-                    } else {
-                        setHoroscopeInferenceLoading(false)
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to fetch horoscope:', error)
-            } finally {
-                setHoroscopeLoading(false)
-            }
-        })()
-
-        await Promise.allSettled([weatherTask, wardrobeTask, horoscopeTask])
+        await Promise.allSettled([fetchWeather(location), wardrobeTask, refreshHoroscope(location)])
     }
 
     useEffect(() => {
@@ -158,10 +160,28 @@ export default function Home() {
         void initializeDashboard()
     }, [])
 
-    const handleSettingsSaved = async () => {
-        const location = await fetchConfiguredLocation()
-        setDefaultLocation(location)
-        await fetchDashboard(location)
+    const handleSettingsSaved = async (changes) => {
+        if (!changes) {
+            const location = await fetchConfiguredLocation()
+            setDefaultLocation(location)
+            await fetchDashboard(location)
+            return
+        }
+
+        const location = (changes.weather_location || '').trim() || defaultLocation
+
+        if (changes.weatherLocationChanged) {
+            setDefaultLocation(location)
+            await Promise.allSettled([
+                fetchWeather(location),
+                refreshHoroscope(location)
+            ])
+            return
+        }
+
+        if (changes.zodiacSignChanged) {
+            await refreshHoroscope(location)
+        }
     }
 
     const refreshing = weatherLoading || wardrobeLoading || horoscopeLoading || horoscopeInferenceLoading

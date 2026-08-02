@@ -242,6 +242,7 @@
     "localRembgInstall": "pip install rembg onnxruntime",
     "installRembg": "一键安装 rembg",
     "installingRembg": "安装中...",
+    "rembgInstalled": "rembg 已安装",
     "installRembgSuccess": "rembg 安装成功，可切换使用本地模式",
     "installRembgFailed": "安装失败，请稍后重试或使用 remove.bg API",
     "removebgDesc": "专业级抠图效果，需自行提供 API Key",

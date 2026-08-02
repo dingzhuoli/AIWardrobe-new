@@ -1,14 +1,25 @@
 """
 rembg 背景移除服务
 """
-from PIL import Image
 import io
+import importlib.util
+
+from PIL import Image
 
 
 try:
     from rembg import remove as rembg_remove
 except ImportError:
     rembg_remove = None
+
+
+def is_local_rembg_available() -> bool:
+    """检查本地背景移除依赖是否可用。"""
+    importlib.invalidate_caches()
+    return (
+        importlib.util.find_spec("rembg") is not None
+        and importlib.util.find_spec("onnxruntime") is not None
+    )
 
 
 def remove_background(image_bytes: bytes) -> bytes:
