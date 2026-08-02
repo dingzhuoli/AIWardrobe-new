@@ -15,7 +15,7 @@
 
 衣類の写真をアップロードし、背景を自動除去、AI ビジョンでカテゴリを分類、天気やスタイルの好みに合わせたコーディネートを提案 — すべてひとつのアプリで。
 
-[English](./README.md) | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md)
+[简体中文](./README.md) | [English](./README.en.md) | [日本語](./README.ja.md)
 
 ---
 
