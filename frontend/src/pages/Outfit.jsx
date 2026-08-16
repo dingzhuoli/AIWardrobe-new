@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, Shuffle } from 'lucide-react'
 
-import { API_BASE, toImageUrl } from '../utils/api'
+import { API_BASE, apiFetch, toImageUrl } from '../utils/api'
 
 const CATEGORIES = [
     { key: 'tops', labelKey: 'outfit.top' },
@@ -32,7 +32,7 @@ export default function Outfit() {
 
     const fetchWardrobe = async (signal) => {
         try {
-            const response = await fetch(`${API_BASE}/wardrobe`, { signal })
+            const response = await apiFetch(`${API_BASE}/wardrobe`, { signal })
             if (response.ok) {
                 const data = await response.json()
                 setWardrobe({

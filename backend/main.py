@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
+import os
 from pathlib import Path
 
 from api.upload import router as upload_router
@@ -16,6 +17,7 @@ from api.recommendation import router as recommendation_router
 from api.horoscope import router as horoscope_router
 from api.tryon import router as tryon_router
 from storage.db import init_db
+from auth import AdminAuthMiddleware, router as auth_router
 
 # 上传目录
 UPLOAD_DIR = Path(__file__).parent / "uploads"
@@ -40,10 +42,19 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# 管理员认证必须包裹 API、上传图片和接口文档。
+app.add_middleware(AdminAuthMiddleware)
+
 # CORS 配置 - 允许前端访问
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        origin.strip()
+        for origin in os.getenv(
+            "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+        ).split(",")
+        if origin.strip()
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,6 +64,7 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # 注册路由
+app.include_router(auth_router, prefix="/api")
 app.include_router(upload_router, prefix="/api", tags=["上传"])
 app.include_router(wardrobe_router, prefix="/api", tags=["衣柜"])
 app.include_router(config_router, prefix="/api", tags=["配置"])

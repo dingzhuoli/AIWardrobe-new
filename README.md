@@ -205,11 +205,25 @@ npm run dev
 
 ## Docker 部署
 
+### 创建管理员凭据
+
+本版本默认启用管理员认证。未配置凭据时，健康检查仍可使用，但衣橱 API、上传图片和接口文档都会拒绝访问。
+
+```bash
+cp backend/.env.example backend/.env
+python3 backend/generate_admin_secrets.py
+```
+
+按提示设置管理员用户名和至少 12 位的密码，然后把命令输出的五行配置复制到 `backend/.env`。密码只保存为 PBKDF2-SHA256 哈希，浏览器登录态使用签名的 HttpOnly Cookie。
+
+生产环境务必使用 HTTPS；如果只允许本机或反向代理访问，可把 Compose 端口改为 `127.0.0.1:8000:8000`。
+
 ### 本地构建
 
 ```bash
 docker build -t aiwardrobe:local .
 docker run -d --name ai_wardrobe -p 8000:8000 \
+  --env-file backend/.env \
   -v $(pwd)/backend/uploads:/app/backend/uploads \
   -v $(pwd)/backend/data:/app/backend/data \
   aiwardrobe:local
@@ -226,17 +240,13 @@ Compose 会挂载：
 - `backend/uploads`：衣物图片、抠图结果、试穿结果
 - `backend/data`：容器内 SQLite 数据库
 
-### 使用预构建镜像
+### 关于上游预构建镜像
 
-```bash
-docker pull ghcr.io/leoz9/aiwardrobe:latest
-docker run -d --name ai_wardrobe -p 8000:8000 \
-  -v $(pwd)/backend/uploads:/app/backend/uploads \
-  -v $(pwd)/backend/data:/app/backend/data \
-  ghcr.io/leoz9/aiwardrobe:latest
-```
+上游的 `ghcr.io/leoz9/aiwardrobe:latest` 不包含本仓库新增的管理员登录功能。部署管理员版本时请使用上面的 `docker compose up --build -d` 从本仓库源码构建，不要直接拉取上游镜像。
 
 容器模式下访问：http://localhost:8000
+
+登录成功前，所有 `/api`、`/uploads`、`/docs`、`/redoc` 与 `/openapi.json` 请求都会受到保护；`/health` 保持公开，供 Docker 健康检查使用。连续登录失败会触发临时限速。
 
 ## 配置说明
 

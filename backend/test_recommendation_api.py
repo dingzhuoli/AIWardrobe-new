@@ -1,4 +1,5 @@
 import asyncio
+import os
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -7,11 +8,30 @@ from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
+from auth import hash_password
+
+TEST_ADMIN_PASSWORD = "test administrator password"
+os.environ.setdefault("ADMIN_USERNAME", "admin")
+os.environ.setdefault("ADMIN_PASSWORD_HASH", hash_password(TEST_ADMIN_PASSWORD, iterations=100_000))
+os.environ.setdefault("ADMIN_SESSION_SECRET", "test-session-secret-that-is-longer-than-thirty-two-characters")
+os.environ.setdefault("ADMIN_COOKIE_SECURE", "false")
+
 import main
 import storage.db as db_store
 import services.weather as weather_service
 from domain.clothes import resolve_category_value
 from services.weather import build_weather_cache_bucket, build_weather_cache_key
+
+
+def _authenticated_client():
+    client = TestClient(main.app)
+    response = client.post(
+        "/api/auth/login",
+        json={"username": "admin", "password": TEST_ADMIN_PASSWORD},
+    )
+    if response.status_code != 200:
+        raise AssertionError(f"test login failed: {response.text}")
+    return client
 
 
 def _mock_weather(location: str):
@@ -76,7 +96,7 @@ class RecommendationApiTests(unittest.TestCase):
 
         with patch("api.recommendation.get_weather", new=AsyncMock(side_effect=_mock_weather)):
             with patch("api.recommendation.get_ai_recommendation", new=AsyncMock(side_effect=fake_get_ai_recommendation)):
-                client = TestClient(main.app)
+                client = _authenticated_client()
                 response = client.get(
                     "/api/recommendation",
                     params={
@@ -114,7 +134,7 @@ class RecommendationApiTests(unittest.TestCase):
             if temp_file.exists():
                 temp_file.unlink()
 
-            client = TestClient(main.app)
+            client = _authenticated_client()
 
             get_resp = client.get("/api/config")
             self.assertEqual(get_resp.status_code, 200)
@@ -143,7 +163,7 @@ class RecommendationApiTests(unittest.TestCase):
 
     def test_config_reports_local_rembg_install_status(self):
         with patch("api.config.is_local_rembg_available", return_value=True):
-            client = TestClient(main.app)
+            client = _authenticated_client()
             response = client.get("/api/config")
 
         self.assertEqual(response.status_code, 200)

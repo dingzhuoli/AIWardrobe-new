@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { API_BASE } from '../utils/api'
+import { API_BASE, apiFetch } from '../utils/api'
 const DEFAULT_LOCATION = '上海, 上海市, 中国'
 
 const RecommendationContext = createContext(null)
@@ -34,7 +34,7 @@ export function RecommendationProvider({ children }) {
   useEffect(() => {
     const fetchDefaultCity = async () => {
       try {
-        const response = await fetch(`${API_BASE}/config`)
+        const response = await apiFetch(`${API_BASE}/config`)
         if (!response.ok) {
           return
         }
@@ -77,7 +77,7 @@ export function RecommendationProvider({ children }) {
       if (trimmedGoal) {
         params.set('goal', trimmedGoal)
       }
-      const response = await fetch(`${API_BASE}/recommendation?${params.toString()}`)
+      const response = await apiFetch(`${API_BASE}/recommendation?${params.toString()}`)
       if (!response.ok) {
         const errorPayload = await response.json().catch(() => ({}))
         if (requestId === requestIdRef.current) {

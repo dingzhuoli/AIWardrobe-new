@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import FilterBar from '../components/FilterBar'
 import { PackageOpen, Trash2 } from 'lucide-react'
 
-import { API_BASE, toImageUrl } from '../utils/api'
+import { API_BASE, apiFetch, toImageUrl } from '../utils/api'
 
 export default function Wardrobe() {
     const { t } = useTranslation()
@@ -25,7 +25,7 @@ export default function Wardrobe() {
 
     const fetchWardrobe = useCallback(async (signal) => {
         try {
-            const response = await fetch(`${API_BASE}/wardrobe`, { signal })
+            const response = await apiFetch(`${API_BASE}/wardrobe`, { signal })
             if (response.ok) {
                 const data = await response.json()
                 setWardrobe({
@@ -58,7 +58,7 @@ export default function Wardrobe() {
         }))
 
         try {
-            const response = await fetch(`${API_BASE}/clothes/${id}`, {
+            const response = await apiFetch(`${API_BASE}/clothes/${id}`, {
                 method: 'DELETE'
             })
             if (!response.ok) {

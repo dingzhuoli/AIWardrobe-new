@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/leoz9/aiwardrobe:latest
+    image: aiwardrobe-admin:local
     container_name: ai_wardrobe
     ports:
       - "8000:8000"

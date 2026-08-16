@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
-import { API_BASE } from '../utils/api'
+import { API_BASE, apiFetch } from '../utils/api'
 
 const UploadContext = createContext(null)
 
@@ -36,7 +36,7 @@ export function UploadProvider({ children }) {
     formData.append('file', file)
 
     setStage('upload.removingBg', current, total)
-    const response = await fetch(`${API_BASE}/upload`, {
+    const response = await apiFetch(`${API_BASE}/upload`, {
       method: 'POST',
       body: formData
     })

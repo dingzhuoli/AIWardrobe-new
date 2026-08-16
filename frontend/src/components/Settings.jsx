@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../contexts/ThemeContext'
 import { Sun, Moon, Globe, Sparkles, MapPin, X, ChevronDown, List, Cable } from 'lucide-react'
-import { API_BASE } from '../utils/api'
+import { API_BASE, apiFetch } from '../utils/api'
 
 const LANGUAGES = [
     { code: 'zh', label: '中文' },
@@ -164,7 +164,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
 
             setSearchingLocations(true)
             try {
-                const response = await fetch(`${API_BASE}/cities?query=${encodeURIComponent(query)}&limit=10`, {
+                const response = await apiFetch(`${API_BASE}/cities?query=${encodeURIComponent(query)}&limit=10`, {
                     signal: controller.signal
                 })
                 if (!response.ok) {
@@ -204,7 +204,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
 
     const fetchConfig = async (signal) => {
         try {
-            const response = await fetch(`${API_BASE}/config`, { signal })
+            const response = await apiFetch(`${API_BASE}/config`, { signal })
             if (response.ok) {
                 const data = await response.json()
                 const refreshConfig = getRefreshConfig(data)
@@ -235,7 +235,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     const fetchModels = async () => {
         setLoading(true)
         try {
-            const response = await fetch(`${API_BASE}/models`)
+            const response = await apiFetch(`${API_BASE}/models`)
             if (response.ok) {
                 const data = await response.json()
                 setModels(data.models || [])
@@ -261,7 +261,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
         }
 
         try {
-            const response = await fetch(`${API_BASE}/test-connection`, {
+            const response = await apiFetch(`${API_BASE}/test-connection`, {
                 method: 'POST'
             })
             const data = await response.json()
@@ -283,7 +283,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
     const handleInstallRembg = async () => {
         setInstallingRembg(true)
         try {
-            const response = await fetch(`${API_BASE}/install-rembg`, {
+            const response = await apiFetch(`${API_BASE}/install-rembg`, {
                 method: 'POST'
             })
             const data = await response.json().catch(() => ({}))
@@ -336,7 +336,7 @@ const Settings = ({ isOpen, onClose, onSave }) => {
                 payload.tryon_api_key = config.tryon_api_key
             }
 
-            const response = await fetch(`${API_BASE}/config`, {
+            const response = await apiFetch(`${API_BASE}/config`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

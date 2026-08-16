@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
 
-import { API_BASE, toImageUrl } from '../utils/api'
+import { API_BASE, apiFetch, toImageUrl } from '../utils/api'
 
 export default function ClothesDetail() {
     const { t } = useTranslation()
@@ -26,7 +26,7 @@ export default function ClothesDetail() {
         setLoading(true)
         setError('')
         try {
-            const response = await fetch(`${API_BASE}/clothes/${id}`)
+            const response = await apiFetch(`${API_BASE}/clothes/${id}`)
             if (!response.ok) {
                 throw new Error(response.status === 404 ? 'NOT_FOUND' : 'FETCH_FAILED')
             }
@@ -83,7 +83,7 @@ export default function ClothesDetail() {
             formData.append('garment_id', String(item.id))
             formData.append('category', item.category || 'top')
 
-            const response = await fetch(`${API_BASE}/tryon`, {
+            const response = await apiFetch(`${API_BASE}/tryon`, {
                 method: 'POST',
                 body: formData
             })

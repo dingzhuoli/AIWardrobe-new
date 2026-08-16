@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Settings as SettingsIcon, RefreshCw, Sparkles, CloudSun, Droplets, Wind, Thermometer, ChevronLeft, ChevronRight, Shirt, ArrowRight } from 'lucide-react'
 import Settings from '../components/Settings'
-import { API_BASE, toImageUrl } from '../utils/api'
+import { API_BASE, apiFetch, toImageUrl } from '../utils/api'
 const FALLBACK_LOCATION = '上海, 上海市, 中国'
 
 const formatDate = (locale) => {
@@ -56,7 +56,7 @@ export default function Home() {
 
     const fetchConfiguredLocation = async () => {
         try {
-            const response = await fetch(`${API_BASE}/config`)
+            const response = await apiFetch(`${API_BASE}/config`)
             if (!response.ok) {
                 return FALLBACK_LOCATION
             }
@@ -68,7 +68,7 @@ export default function Home() {
     }
 
     const fetchHoroscope = async (location, includeInference = false) => {
-        const response = await fetch(
+        const response = await apiFetch(
             `${API_BASE}/horoscope/daily?location=${encodeURIComponent(location)}&include_inference=${includeInference}`
         )
         if (!response.ok) return null
@@ -92,7 +92,7 @@ export default function Home() {
     const fetchWeather = async (location = defaultLocation) => {
         setWeatherLoading(true)
         try {
-            const weatherRes = await fetch(`${API_BASE}/weather?location=${encodeURIComponent(location)}`)
+            const weatherRes = await apiFetch(`${API_BASE}/weather?location=${encodeURIComponent(location)}`)
             if (weatherRes.ok) {
                 setWeather(await weatherRes.json())
             }
@@ -130,7 +130,7 @@ export default function Home() {
 
         const wardrobeTask = (async () => {
             try {
-                const wardrobeRes = await fetch(`${API_BASE}/wardrobe`)
+                const wardrobeRes = await apiFetch(`${API_BASE}/wardrobe`)
                 if (wardrobeRes.ok) {
                     const data = await wardrobeRes.json()
                     setWardrobe({
